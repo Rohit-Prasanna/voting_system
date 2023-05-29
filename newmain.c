@@ -161,151 +161,217 @@ node* voter_insert(node* start) {
     return start;
 }
 
-void voting()
-{
-     system("cls");
+void voting() {
+    system("cls");
     printf("\n\n\n\n");
     printf("\t\t     * * * * * LIST OF CANDIDATES * * * * * \n\n\n");
     Sleep(300);
     printf("\t\t\t NAME     & THEIR RESPECTIVE      SYMBOL\n\n");
     Sleep(300);
-    printf("\t\t\t 1.Mamata Banerjee                1.Fish\n");
-    Sleep(300);
-    printf("\t\t\t 2.Deepa Dasmunsi                 2.Boat\n");
-    Sleep(300);
-    printf("\t\t\t 3.Protima Rajak                  3.Motorcycle\n");
-    Sleep(300);
-    printf("\t\t\t 4.Joydeb Halder                  4.Broomstick\n");
-    Sleep(300);
-    printf("\t\t\t 5.Kartik Chandra Ghosh           5.Wheel\n\n\n");
 
-
-
-       int B,j;
-       printf("\t\t\t Plzz, \n");
-       printf("\t\t\t Enter Your Choice \n");
-       for(j=1;j<=1;j++)
-       {
-           scanf("%d",&B);
-
-           if(B==1)
-           {
-               vote1++;
-               printf("\n\n\t\t\t\tYOU HAVE SUCCESSFULLY GIVEN YOUR VOTE TO MAMTA BANERJEE\n");
-               break;
-
-           }
-           if(B==2)
-           {
-               vote2++;
-                printf("\n\n\t\t\t\tYOU HAVE SUCCESSFULLY GIVEN YOUR VOTE TO DEEPA DASMUNSI\n");
-               break;
-
-           }
-           if(B==3)
-           {
-               vote3++;
-                printf("\n\n\t\t\t\tYOU HAVE SUCCESSFULLY GIVEN YOUR VOTE TO PROTIMA RAJAK\n");
-               break;
-
-           }
-           if(B==4)
-           {
-               vote4++;
-                printf("\n\n\t\t\t\tYOU HAVE SUCCESSFULLY GIVEN YOUR VOTE TO JOYDEB HALDER\n");
-               break;
-           }
-           if(B==5)
-           {
-               vote5++;
-                printf("\n\n\t\t\t\tYOU HAVE SUCCESSFULLY GIVEN YOUR VOTE TO KARTIK CHANDRA GHOSH\n");
-               break;
-           }
-            if(B!=1||B!=2||B!=3||B!=4||B!=5)
-           {
-           	printf("\n\t\t************* INVALID CHOICE ENTERED**************\t\t\n");
-           	printf("\n\t\t\tENTER AGAIN\t\t\t\n");
-		   }
-
-
-
-       }
-	   printf("\n\n**************************THANK YOU***************************\n\n");
-	   printf("press any key");
-
+    FILE* file;
+    char filename[] = "candidates.txt";
+    file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Error opening the file.\n");
         getch();
+        return;
+    }
+
+    char line[100];
+    int count = 1;
+    while (fgets(line, sizeof(line), file) != NULL) {
+        printf("\t\t\t %d. %s", count, line);
+        count++;
+    }
+    fclose(file);
+
+    printf("\n\t\t\t Plzz, \n");
+    printf("\t\t\t Enter Your Choice \n");
+    int choice;
+    scanf("%d", &choice);
+    getchar();  // Consume the newline character
+
+    // Update the vote count based on the user's choice
+    file = fopen("vote_count.txt", "r+");
+    if (file == NULL) {
+        printf("Error opening the file.\n");
+        getch();
+        return;
+    }
+    int i;
+    for (i = 1; i <= choice; i++) {
+        fgets(line, sizeof(line), file);
+        if (i == choice) {
+            char candidateName[100];
+            int voteCount;
+            sscanf(line, " %[^:]:%d", candidateName, &voteCount);  // Include a space before the format specifier to skip leading whitespace
+            fseek(file, -strlen(line), SEEK_CUR);  // Move the file pointer back to the beginning of the line
+            fprintf(file, "%s:%d\n", candidateName + 1, voteCount + 1);  // Increment the vote count and skip the first character of the candidate name
+            fclose(file);
+            break;
+        }
+    }
+    fclose(file);
+
+    printf("\n\n**************************THANK YOU***************************\n\n");
+    printf("Press any key to exit...");
+    getch();
 }
 
- void admin()
- {
-     int B;
-     printf("\n\n\n\n");
-     printf("\t\t\t\t\tEnter Your Password To Unlock The Admin Panel\n\n");
-     scanf("%d",&B);
-     if(B==3692)
-     {
-         show();
-
-     }
-     else
-     {
-         printf("Wrong Password\n");
-     }
- }
-
-  void show()
-  {
-  	int G;
-      system("cls");
-
-      printf("\n\n\n\n");
-      printf("\t\t\tPresent Vote Count :\n\n");
-      Sleep(500);
-      printf("\t\t\t  Mamata Banerjee is on     %d Votes\n",vote1);
-      Sleep(500);
-      printf("\t\t\t  Deepa Dasmunsi is on      %d Votes\n",vote2);
-      Sleep(500);
-      printf("\t\t\t  Protima Rajak is on       %d Votes\n",vote3);
-      Sleep(500);
-      printf("\t\t\t  Joydeb Halder  is on      %d Votes\n",vote4);
-      Sleep(500);
-      printf("\t\t\t  Kartik Chandra Ghosh  is on     %d Votes\n\n\n\n",vote5);
-      Sleep(500);
 
 
-      printf("\t\t\t\t\tEnter Any Key For Main Logs\n\n\t\t\t\t\t\t\tOR\n\n\t\t\t\t\tENTER THE SPECIAL PASSWORD TO CLOSING VOTING PORTAL\n ");
-    scanf("%d",&G);
-    if(G==1234)
-    exi();
-    else
-    main_logs(start);
 
-  }
 
-   void winner()
-   {
-       system("cls");
-       printf("\n\n\n\n");
-       if(vote2<vote1 && vote3< vote1 && vote4<vote1 && vote5<vote1)
-        printf("\t\t\tThe present Winner is Mamata Banerjee and she has got %d votes\n\n\n\n",vote1);
 
-       if(vote1<vote2 && vote3< vote2 && vote4<vote2 && vote5<vote2)
-        printf("\t\t\tThe present Winner is Deepa Dasmunsi and she has got %d votes\n\n\n\n",vote2);
 
-        if(vote1<vote3 && vote2< vote3 && vote4<vote3 && vote5<vote3)
-        printf("\t\t\tThe present Winner is Protima Rajak and she has got %d votes\n\n\n\n",vote3);
+void admin() {
+    printf("\n\n\n");
 
-        if(vote1<vote4 && vote2< vote4 && vote3<vote4 && vote5<vote4)
-        printf("\t\t\tThe present Winner is Joydeb Halder and he has got %d votes\n\n\n\n",vote4);
+    int choice;
+    printf("\n\n\n");
+    printf("\t\t\tEnter Your Password To Unlock The Admin Panel\n\n");
+    scanf("%d", &choice);
+    if (choice == 1234) {
+        int adminChoice;
+        printf("\n\n\n");
+        printf("\t\t\t1. ADD CANDIDATE\n");
+        printf("\t\t\t2. SHOW RESULTS\n");
+        printf("\t\t\tEnter your choice: ");
+        scanf("%d", &adminChoice);
 
-        if(vote1<vote5 && vote2< vote5 && vote3<vote5 && vote4<vote5)
-        printf("\t\t\tThe present Winner is Kartik Chandra Ghosh and he has got %d votes\n\n\n\n",vote5);
+        switch (adminChoice) {
+            case 1:
+                addCandidate();
+                break;
+            case 2:
+                show();
+                break;
+            default:
+                printf("Invalid choice.\n");
+                break;
+        }
+    } else {
+        printf("Wrong Password\n");
+    }
+}
 
-        printf("\t\t\t\tEnter Any Key for Main Log\n\n");
+void addCandidate() {
+    FILE* candidatesFile;
+    FILE* voteCountFile;
+    char candidatesFilename[] = "candidates.txt";
+    char voteCountFilename[] = "vote_count.txt";
+    candidatesFile = fopen(candidatesFilename, "a");
+    voteCountFile = fopen(voteCountFilename, "a");
+    if (candidatesFile == NULL || voteCountFile == NULL) {
+        printf("Error opening the file.\n");
+        return;
+    }
+
+    char name[50];
+    char symbol[50];
+
+    printf("Enter the candidate's name: ");
+    scanf(" %[^\n]", name);
+
+    printf("Enter the candidate's symbol: ");
+    scanf(" %[^\n]", symbol);
+
+    fprintf(candidatesFile, "%s - %s\n", name, symbol);
+    fprintf(voteCountFile, "%s:0\n", name);  // Initialize vote count to 0
+    fclose(candidatesFile);
+    fclose(voteCountFile);
+
+    printf("Candidate added successfully.\n");
+}
+
+struct Candidate {
+    char name[100];
+    char symbol[100];
+    int votes;
+};
+
+
+
+// Function to read and display the vote count from the text file
+void readVoteCount() {
+    FILE* file;
+    char filename[] = "vote_count.txt";
+    file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Error opening the file.\n");
+        return;
+    }
+
+    char line[100];
+    while (fgets(line, sizeof(line), file) != NULL) {
+        printf("%s", line);
+    }
+
+    fclose(file);
+}
+
+
+// Function to display the current vote count
+void show(struct Candidate candidates[], int numCandidates) {
+    system("cls");
+
+    printf("\n\n\n\n");
+    printf("Present Vote Count :\n\n");
+    Sleep(500);
+
+    readVoteCount();
+
+    Sleep(500);
+
+    printf("\n\n**************************THANK YOU***************************\n\n");
+    printf("Press any key to exit...");
+    getch();
+}
+
+
+void winner(struct Candidate candidates[], int numCandidates) {
+    system("cls");
+    printf("\n\n\n\n");
+
+    FILE* file;
+    char filename[] = "vote_count.txt";
+    file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Error opening the file.\n");
         getch();
         main_logs(start);
+        return;
+    }
 
-   }
+    int maxVotes = 0;
+    char winnerName[100];
+    char line[100];
+
+    while (fgets(line, sizeof(line), file) != NULL) {
+        char candidateName[100];
+        int voteCount;
+        sscanf(line, "%[^:]:%d", candidateName, &voteCount);
+
+        if (voteCount > maxVotes) {
+            maxVotes = voteCount;
+            strcpy(winnerName, candidateName);
+        }
+    }
+
+    fclose(file);
+
+    if (maxVotes > 0) {
+        printf("\t\t\tThe present Winner is %s and they have got %d votes\n\n\n\n", winnerName, maxVotes);
+    } else {
+        printf("\t\t\tNo winner found. There are no candidates.\n\n\n\n");
+    }
+
+    printf("\t\t\t\tEnter any key to return to the main log\n\n");
+    getch();
+    main_logs(start);
+}
+
 
    void stop()
    {
@@ -323,29 +389,25 @@ void voting()
 
    }
 
-   void not_again()
-   {
-        int A;
-		system("cls");
-        printf("\n\n\n\n");
-        printf("\t\t\t        ***YOU HAVE GIVEN YOUR VOTE SUCCESSFULLY***       \n\n\n");
-        Sleep(300);
-        printf("\t\t\t        ***YOU CANNOT GIVE YOUR VOTE MORE THAN ONCE***     \n\n\n");
-        Sleep(300);
-        printf("\t\t\t If You want to see present winner Enter One(1) or Enter Any Other Key for Main  Logs\n\n");
-        Sleep(300);
+  void not_again(struct Candidate candidates[], int numCandidates) {
+    int A;
+    system("cls");
+    printf("\n\n\n\n");
+    printf("\t\t\t        ***YOU HAVE GIVEN YOUR VOTE SUCCESSFULLY***       \n\n\n");
+    Sleep(300);
+    printf("\t\t\t        ***YOU CANNOT GIVE YOUR VOTE MORE THAN ONCE***     \n\n\n");
+    Sleep(300);
+    printf("\t\t\t If You want to see the present winner, Enter One(1); otherwise, enter any other key for Main Logs\n\n");
+    Sleep(300);
 
-        scanf("%d",&A);
-        if(A==1)
-        {
-            winner();
-        }
-        else
-        {
-            main_logs(start);
-        }
+    scanf("%d", &A);
+    if (A == 1) {
+        winner(candidates, numCandidates);
+    } else {
+        main_logs(start);
+    }
+}
 
-   }
 
    void exi()
    {
