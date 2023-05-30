@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <windows.h>
+
 typedef struct voter_information
 {
-    char aadhar[20];
+    char rollno[20];
     char name[50];
     char birth_date[15];
     struct voter_information *next;
@@ -82,84 +83,88 @@ node *main_logs(node *start)
 
     return start;
 }
-node* create_node(char aadhar[], char name[], char birth_date[]) {
+node* create_node(char rollno[], char name[], char birth_date[]) {
     node* new_node = (node*)malloc(sizeof(node));
-    strcpy(new_node->aadhar, aadhar);
+    strcpy(new_node->rollno, rollno);
     strcpy(new_node->name, name);
     strcpy(new_node->birth_date, birth_date);
     new_node->next = NULL;
     return new_node;
 }
 
+
 node* voter_insert(node* start) {
     int R = 3;
     int UNIVERSAL = 0;
     int* z = &UNIVERSAL;
     node* temp;
-    char name[50], birth_date[15], aadhar[20];
+    char name[50], birth_date[15], rollno[20];
     system("cls");
     printf("\n\n\n\n");
     printf("\t IF AADHAR ID, YOUR NAME AND YOUR DATE OF BIRTH MATCHES THEN YOU CAN GIVE YOUR VOTE OTHERWISE NOT\n\n");
     Sleep(300);
     printf("\t\t\t ID YOU DO WRONG %d TIMES, THE PORTAL WILL BE CLOSED AUTOMATICALLY\n\n\n", R);
     Sleep(300);
-    printf("\t\tPlease \n");
-    Sleep(300);
-    printf("\t\t\tEnter your AADHAR ID number: ");
-    gets(aadhar);
-    gets(aadhar);
-    printf("\t\t\tEnter Your NAME: ");
-    gets(name);
-    printf("\t\t\tEnter Your BIRTH DATE in dd-mm-yyyy format: ");
-    gets(birth_date);
 
-    FILE* file;
-    char filename[] = "voters.txt";
-    file = fopen(filename, "r");
-    if (file == NULL) {
-        printf("Error opening the file.\n");
-        stop();
-        return start;
-    }
+    while (R > 0) {
+        printf("\t\tPlease \n");
+        Sleep(300);
+        printf("\t\t\tEnter your roll number: ");
+        scanf("%s", rollno);
+        printf("\t\t\tEnter Your NAME: ");
+        scanf("%s", name);
+        printf("\t\t\tEnter Your BIRTH DATE in dd-mm-yyyy format: ");
+        scanf("%s", birth_date);
 
-    int found = 0;
-    char line[100];
-    while (fgets(line, sizeof(line), file) != NULL) {
-        sscanf(line, "%s %[^\n]%*c %s", aadhar, name, birth_date);
-        temp = create_node(aadhar, name, birth_date);
-        if (search(temp->aadhar, temp->name, temp->birth_date, start, z) != NULL) {
-            found = 1;
+        FILE* file = fopen("voters.csv", "r");
+        if (file == NULL) {
+            printf("Error opening the file.\n");
+            stop();
+            return start;
+        }
+
+        int found = 0;
+        char line[100];
+        while (fgets(line, sizeof(line), file) != NULL) {
+            char fileRollno[50], fileName[50], fileBirthDate[15];
+            sscanf(line, "%[^,],%[^,],%[^\n]", fileRollno, fileName, fileBirthDate);
+            if (strcasecmp(rollno, fileRollno) == 0 && strcasecmp(name, fileName) == 0 && strcasecmp(birth_date, fileBirthDate) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        fclose(file);
+
+        if (found) {
+            if (UNIVERSAL == 0) {
+                voting();
+            }
+            else {
+                not_again(start);
+            }
             break;
         }
-    }
-    fclose(file);
-
-    if (found) {
-        if (UNIVERSAL == 0) {
-            voting();
-        }
         else {
-            not_again();
-        }
-    }
-    else {
-        R--;
-        if (R == 0) {
-            stop();
-        }
-        else {
-            printf("\n\n\n\n");
-            printf("\tYour AADHAR ID or NAME or DATE OF BIRTH is wrong\n\n");
-            Sleep(300);
-            printf("\t\t\tPlz Re-Enter\n\n");
-            Sleep(300);
-            system("pause");
-            start = voter_insert(start);
+            R--;
+            if (R == 0) {
+                stop();
+            }
+            else {
+                printf("\n\n\n\n");
+                printf("\tYour ROLL.NO or NAME or DATE OF BIRTH is wrong\n\n");
+                Sleep(300);
+                printf("\t\t\tPlz Re-Enter\n\n");
+                Sleep(300);
+                system("pause");
+            }
         }
     }
 
     return start;
 }
+
+
+
 
 void voting() {
     system("cls");
@@ -389,8 +394,7 @@ void winner(struct Candidate candidates[], int numCandidates) {
 
    }
 
-  void not_again(struct Candidate candidates[], int numCandidates) {
-    int A;
+void not_again(struct Candidate candidates[], int numCandidates) {
     system("cls");
     printf("\n\n\n\n");
     printf("\t\t\t        ***YOU HAVE GIVEN YOUR VOTE SUCCESSFULLY***       \n\n\n");
@@ -400,13 +404,17 @@ void winner(struct Candidate candidates[], int numCandidates) {
     printf("\t\t\t If You want to see the present winner, Enter One(1); otherwise, enter any other key for Main Logs\n\n");
     Sleep(300);
 
-    scanf("%d", &A);
-    if (A == 1) {
+    int choice;
+    scanf("%d", &choice);
+    getchar();  // Consume the newline character
+
+    if (choice == 1) {
         winner(candidates, numCandidates);
     } else {
         main_logs(start);
     }
 }
+
 
 
    void exi()
@@ -428,7 +436,7 @@ node *search(char x[],char y[],char z[],node *start,int *Y)
   if(start==NULL)
   {
       space=(node*)malloc(sizeof(node));
-     strcpy(space->aadhar,x);
+     strcpy(space->rollno,x);
      strcpy(space->name,y);
      strcpy(space->birth_date,z);
 
@@ -441,7 +449,7 @@ node *search(char x[],char y[],char z[],node *start,int *Y)
       t=start;
       while(t!=NULL)
        {
-          if((strcmp(t->aadhar,x)==0&& strcmp(t->name,y)==0 &&strcmp(t->birth_date,z)==0))
+          if((strcmp(t->rollno,x)==0&& strcmp(t->name,y)==0 &&strcmp(t->birth_date,z)==0))
           {
           	*Y=1;
 
@@ -455,7 +463,7 @@ node *search(char x[],char y[],char z[],node *start,int *Y)
 
           	space=(node*)malloc(sizeof(node));
 
-       		strcpy(space->aadhar,x);
+       		strcpy(space->rollno,x);
 
        		strcpy(space->name,y);
 
